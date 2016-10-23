@@ -1,6 +1,6 @@
 # Datastore serialization performance test
 
-Google App Engine's Python datastore library has very slow deserialization for models that have many properties. This project benchmarks this library.
+Google App Engine's Python original datastore library called "db" has very slow deserialization for models that have many properties. This project benchmarks this library, and compares it to ndb and our own hacked up minimal version.
 
 
 ## Setup
@@ -29,18 +29,24 @@ https://[YOUR PROJECT ID].appspot.com/db_entity_setup
 
 ## Run the performance test
 
-Go to: https://[YOUR PROJECT ID].appspot.com/db_entity_test
+Go to the following URLs
+
+* https://[YOUR PROJECT ID].appspot.com/db_entity_test
+* https://[YOUR PROJECT ID].appspot.com/serialization_test
 
 
 ## Results and notes
 
-On an App Engine F1 instance:
+On an App Engine F1 instance, the average time to get 20 entities was the following. Don't trust these numbers too much: I did not repeat them substantially, 
 
-   db.Model  10 properties: get: 79 ms  datastore.GetAsync: 60 ms
-   db.Model 100 properties: get: 303 ms  datastore.GetAsync: 268 ms
- db.Expando 100 properties: get: 576 ms  datastore.GetAsync: 251 ms
-  ndb.Model 100 properties: get: 154 ms  datastore.GetAsync: 208 ms
-ndb.Expando 100 properties: get: 149 ms  datastore.GetAsync: 191 ms
+Model class | Num. Properties | (db|ndb).get | datastore.GetAsync | lazy.get
+---         | ---             | ---          | ---                |
+   db.Model | 10 properties   |  79 ms       | 60 ms              | 32 ms
+   db.Model | 100 properties  | 303 ms       | 268 ms             | 80 ms
+ db.Expando | 100 properties  | 576 ms       | 251 ms             | 80 ms
+  ndb.Model | 100 properties  | 154 ms       | 208 ms             | 70 ms
+ndb.Expando | 100 properties  | 149 ms       | 191 ms             | 59 ms
+
 
 Conclusions:
 * db deserialization is slower than ndb. The times for datastore.GetAsync are basically constant since the data sizes are extremely similar. However, even the ndb.Model is faster than the db.Model.
@@ -50,7 +56,8 @@ Conclusions:
 Notes:
 * The first request to a new deploy seems to run faster than subsequent requests. My guess: Google removes the performance limits for this request to compensate for the overhead of loading code etc.
 * With ndb's built-in caching turned on, the numbers are substantially faster.
-* Even ignoring ndb's memcache, it seems to have much faster deserialization.
+* Even ignoring ndb's memcache, it seems to have faster deserialization.
+* There is nearly zero performance difference for these different requests when using dev_appserver.py, although the larger objects are slower.
 
 
 ## How data gets from a db.Model to bytes
