@@ -40,7 +40,7 @@ Go to the following URLs
 On an App Engine F1 instance, the average time to get 20 entities was the following. Don't trust these numbers too much: I did not repeat them substantially, 
 
 Model class | Num. Properties | (db|ndb).get | datastore.GetAsync | lazy.get
----         | ---             | ---          | ---                |
+---         | ---             | ---          | ---                | ---
    db.Model | 10 properties   |  79 ms       | 60 ms              | 32 ms
    db.Model | 100 properties  | 303 ms       | 268 ms             | 80 ms
  db.Expando | 100 properties  | 576 ms       | 251 ms             | 80 ms
@@ -58,6 +58,8 @@ Notes:
 * With ndb's built-in caching turned on, the numbers are substantially faster.
 * Even ignoring ndb's memcache, it seems to have faster deserialization.
 * There is nearly zero performance difference for these different requests when using dev_appserver.py, although the larger objects are slower.
+
+* The python-compat "flexible environment" runtime is significantly slower at serializing/deserializing to the protocol buffer objects than the standard environment. Accessing protocol buffer attributes is slower than accessing native Python attributes in the standard environment, but the same speed in the flexible environment. The standard environment probably uses native code, while the flexible environment uses a Python implementation. This means that calling App Engine APIs is relatively more expensive in the flexible environment.
 
 
 ## How data gets from a db.Model to bytes

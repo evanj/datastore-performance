@@ -1,0 +1,26 @@
+runtime: python-compat
+vm: true
+threadsafe: true
+service: performance-flex
+
+resources:
+  cpu: 1
+  memory_gb: 1
+
+manual_scaling:
+  instances: 1
+
+handlers:
+- url: /.*
+  script: perf.app
+  login: admin
+  secure: always
+
+skip_files:
+- ^(.*/)?#.*#$
+- ^(.*/)?.*~$
+- ^(.*/)?.*\.py[co]$
+- ^(.*/)?.*/RCS/.*$
+- ^(.*/)?\..*$
+# skip the entire venv directory
+- ^venv$
