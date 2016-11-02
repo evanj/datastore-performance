@@ -1,6 +1,6 @@
 # Datastore serialization performance test
 
-Google App Engine's Python original datastore library called "db" has very slow deserialization for models that have many properties. This project benchmarks this library, and compares it to ndb and our own hacked up minimal version.
+Google App Engine's Python original datastore library called "db" has very slow deserialization for models that have many properties. This project benchmarks this library, and compares it to ndb and our own hacked up minimal version. For details [see my blog post](http://www.evanjones.ca/app-engine-db-serialization.html).
 
 
 ## Setup
@@ -39,8 +39,8 @@ Go to the following URLs
 
 On an App Engine F1 instance, the average time to get 20 entities was the following. Don't trust these numbers too much: I did not repeat them substantially, 
 
-Model class | Num. Properties | (db|ndb).get | datastore.GetAsync | lazy.get
----         | ---             | ---          | ---                | ---
+Model class | Num. Properties | db/ndb.get | datastore.GetAsync | lazy.get
+---         | ---             | ---        | ---                | ---
    db.Model | 10 properties   |  79 ms       | 60 ms              | 32 ms
    db.Model | 100 properties  | 303 ms       | 268 ms             | 80 ms
  db.Expando | 100 properties  | 576 ms       | 251 ms             | 80 ms
